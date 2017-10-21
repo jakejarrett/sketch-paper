@@ -39,6 +39,7 @@ class USketch : Window {
 	
 	private HeaderBar headerbar;
 	private string file;
+	private string title = "Sketch Paper";
 
 	/**
 	 * Setup the main interface & determine if we should show an "Open" state.
@@ -61,7 +62,7 @@ class USketch : Window {
 	 * Setup the headerbar.
 	 */
 	private void setup_headerbar () {
-		this.headerbar.title = "USketch";
+		this.headerbar.title = this.title;
 
 		var open_button = new Gtk.Button.with_label ("Open");
 		open_button.set_valign (Gtk.Align.CENTER);

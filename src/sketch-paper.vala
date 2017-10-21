@@ -35,16 +35,47 @@ public class Options : GLib.Object {
 
 }
 
-class USketch : Window {
+class SketchPaper : Gtk.Application {
+
+	private View view;
+
+	/**
+	 * Constructor
+	 */
+	public SketchPaper (Options options) {
+		GLib.Object (application_id: "com.github.jakejarrett.sketch-paper", flags: ApplicationFlags.FLAGS_NONE);
+		this.view = new View(options);
+	}
+
+	/**
+	 * Start the application
+	 */
+	public static int main (string[] args) {
+		Gtk.init (ref args);
+		Options opts = new Options ();
+
+		if (!opts.parse (ref args)) {
+			return -1;
+		}
+		new SketchPaper(opts);
+		Gtk.main ();
+
+		return 0;
+	}
+
+}
+
+class View : Window {
 	
 	private HeaderBar headerbar;
 	private string file;
 	private string title = "Sketch Paper";
+	
 
 	/**
 	 * Setup the main interface & determine if we should show an "Open" state.
 	 */
-	public USketch (Options options) {
+	public View (Options options) {
 		if (options.option_output != "") {
 			this.file = options.option_output;
 			this.read_file ();
@@ -160,20 +191,6 @@ class USketch : Window {
 		} catch (IOError e) {
 			stderr.printf (e.message + "\n");
 		}
-	}
-
-	public static int main (string[] args) {
-		Gtk.init (ref args);
-		Options opts = new Options ();
-
-		if (!opts.parse (ref args)) {
-			return -1;
-		}
-
-		new USketch(opts);
-		Gtk.main ();
-
-		return 0;
 	}
 
 }

@@ -4,16 +4,20 @@ class View : Window {
 
 	private HeaderBar headerbar;
 	private string file;
-	private string title = "Sketch Paper";
+	private string window_title = "Sketch Paper";
+	private string preview_image;
+	private ArchiveController achive_controller;
 
 	/**
 	 * Setup the main interface & determine if we should show an "Open" state.
 	 */
 	public View (Options options) {
+		this.achive_controller = new ArchiveController();
+
 		if (options.option_output != "") {
-			ArchiveController achive_controller = new ArchiveController();
 			this.file = options.option_output;
-			achive_controller.read_file (this.file);
+			this.achive_controller.read_file (this.file);
+			this.preview_image = this.achive_controller.get_preview_image ();
 		}
 
 		this.headerbar = new Gtk.HeaderBar ();
@@ -28,7 +32,7 @@ class View : Window {
 	 * Setup the headerbar.
 	 */
 	private void setup_headerbar () {
-		this.headerbar.title = this.title;
+		this.headerbar.title = this.window_title;
 
 		var open_button = new Gtk.Button.with_label ("Open");
 		open_button.set_valign (Gtk.Align.CENTER);
@@ -56,6 +60,13 @@ class View : Window {
 		grid.orientation = Gtk.Orientation.HORIZONTAL;
 		grid.add (label_one);
 		grid.add (label_two);
+		
+		if (this.preview_image != "") {
+			Gtk.Image image = new Gtk.Image ();
+			image.set_from_file (this.preview_image);
+			grid.add (image);
+		}
+
 		this.add (grid);
 	}
 
@@ -65,7 +76,6 @@ class View : Window {
 	 * TODO- Move the archive/unarchive logic to a controller.
 	 */
 	private void on_open_clicked () {
-		ArchiveController achive_controller = new ArchiveController();
 		var file_chooser = new FileChooserDialog ("Open File", this,
 			FileChooserAction.OPEN,
 			"_Cancel",
@@ -81,7 +91,7 @@ class View : Window {
 		if (file_chooser.run () == ResponseType.ACCEPT) {
 			this.file = file_chooser.get_filename ();
 			file_chooser.destroy ();
-			achive_controller.read_file (this.file);
+			this.achive_controller.read_file (this.file);
 			this.on_open_file ();
 			this.show_all ();
 		}
@@ -92,5 +102,6 @@ class View : Window {
 	 */
 	private void on_open_file () {
 		this.headerbar.subtitle = this.file;
+		this.preview_image = this.achive_controller.get_preview_image ();
 	}
 }

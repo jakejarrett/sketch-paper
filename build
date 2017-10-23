@@ -1,3 +1,3 @@
 #!/bin/sh
 
-valac --thread --pkg gtk+-3.0 --pkg json-glib-1.0 --pkg libarchive src/sketch-paper.vala
+valac --thread --pkg gtk+-3.0 --pkg json-glib-1.0 --pkg libarchive src/*.vala --output=dist/sketch-paper

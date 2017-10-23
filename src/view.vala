@@ -80,12 +80,11 @@ class View : Window {
 
 		if (file_chooser.run () == ResponseType.ACCEPT) {
 			this.file = file_chooser.get_filename ();
+			file_chooser.destroy ();
 			achive_controller.read_file (this.file);
 			this.on_open_file ();
 			this.show_all ();
 		}
-
-		file_chooser.destroy ();
 	}
 
 	/**

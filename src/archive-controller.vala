@@ -23,6 +23,7 @@ class ArchiveController : GLib.Object {
 	public void read_file (string file) {
 		this.archive_read = new Archive.Read ();
 		this.archive_write = new Archive.WriteDisk ();
+		Posix.rmdir (this.file_destination);
 		Posix.mkdir (this.file_destination, 0700);
 		Posix.chdir (this.file_destination);
 		this.extract_file (file);
@@ -34,7 +35,6 @@ class ArchiveController : GLib.Object {
 		Posix.off_t offset = 0;
 
 		this.archive_read.read_data_block (out buff, out size, out offset);
-		this.archive_write.set_format (Archive.Format.CPIO_SVR4_CRC);
 		this.archive_write.write_data_block (buff, size, offset);
 		this.archive_write.finish_entry ();
 	}
@@ -69,7 +69,6 @@ class ArchiveController : GLib.Object {
 	}
 
 	public string get_preview_image () {
-		GLib.stdout.printf (this.file_destination + "/previews/preview.png"); 
 		return this.file_destination + "/previews/preview.png";
 	}
 

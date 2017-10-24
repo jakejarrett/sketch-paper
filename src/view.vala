@@ -7,6 +7,7 @@ class View : Window {
 	private string window_title = "Sketch Paper";
 	private string preview_image;
 	private ArchiveController archive_controller;
+	private Box vbox;
 
 	/**
 	 * Setup the main interface & determine if we should show an "Open" state.
@@ -22,7 +23,9 @@ class View : Window {
 
 		this.headerbar = new Gtk.HeaderBar ();
 		this.setup_headerbar ();
+		this.vbox = new Box (Orientation.VERTICAL, 0);
 		this.setup_grid ();
+		this.add (this.vbox);
 
 		this.show_all ();
 		this.destroy.connect (Gtk.main_quit);
@@ -54,18 +57,14 @@ class View : Window {
 	 * Setup the Grid interface.
 	 */
 	private void setup_grid () {
-		var vbox = new Box (Orientation.VERTICAL, 0);
-		
 		if (this.preview_image != "") {
 			var scroll = new ScrolledWindow (null, null);
 			scroll.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
 			Gtk.Image image = new Gtk.Image ();
 			image.set_from_file (this.preview_image);
 			scroll.add (image);
-			vbox.pack_start (scroll, true, true, 0);
+			this.vbox.pack_start (scroll, true, true, 0);
 		}
-
-		this.add (vbox);
 	}
 
 	/**
@@ -101,5 +100,10 @@ class View : Window {
 	private void on_open_file () {
 		this.headerbar.subtitle = this.file;
 		this.preview_image = this.archive_controller.get_preview_image ();
+		this.remove (this.vbox);
+		this.vbox = new Box (Orientation.VERTICAL, 0);
+		this.setup_grid ();
+		this.add (this.vbox);
+		this.show_all ();
 	}
 }

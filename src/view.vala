@@ -6,18 +6,18 @@ class View : Window {
 	private string file;
 	private string window_title = "Sketch Paper";
 	private string preview_image;
-	private ArchiveController achive_controller;
+	private ArchiveController archive_controller;
 
 	/**
 	 * Setup the main interface & determine if we should show an "Open" state.
 	 */
 	public View (Options options) {
-		this.achive_controller = new ArchiveController();
+		this.archive_controller = new ArchiveController();
 
 		if (options.option_output != "") {
 			this.file = options.option_output;
-			this.achive_controller.read_file (this.file);
-			this.preview_image = this.achive_controller.get_preview_image ();
+			this.archive_controller.read_file (this.file);
+			this.preview_image = this.archive_controller.get_preview_image ();
 		}
 
 		this.headerbar = new Gtk.HeaderBar ();
@@ -54,20 +54,18 @@ class View : Window {
 	 * Setup the Grid interface.
 	 */
 	private void setup_grid () {
-		var grid = new Gtk.Grid ();
-		var label_one = new Gtk.Label ("Label 1");
-		var label_two = new Gtk.Label ("Label 2");
-		grid.orientation = Gtk.Orientation.HORIZONTAL;
-		grid.add (label_one);
-		grid.add (label_two);
+		var vbox = new Box (Orientation.VERTICAL, 0);
 		
 		if (this.preview_image != "") {
+			var scroll = new ScrolledWindow (null, null);
+			scroll.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
 			Gtk.Image image = new Gtk.Image ();
 			image.set_from_file (this.preview_image);
-			grid.add (image);
+			scroll.add (image);
+			vbox.pack_start (scroll, true, true, 0);
 		}
 
-		this.add (grid);
+		this.add (vbox);
 	}
 
 	/**
@@ -91,7 +89,7 @@ class View : Window {
 		if (file_chooser.run () == ResponseType.ACCEPT) {
 			this.file = file_chooser.get_filename ();
 			file_chooser.destroy ();
-			this.achive_controller.read_file (this.file);
+			this.archive_controller.read_file (this.file);
 			this.on_open_file ();
 			this.show_all ();
 		}
@@ -102,6 +100,6 @@ class View : Window {
 	 */
 	private void on_open_file () {
 		this.headerbar.subtitle = this.file;
-		this.preview_image = this.achive_controller.get_preview_image ();
+		this.preview_image = this.archive_controller.get_preview_image ();
 	}
 }

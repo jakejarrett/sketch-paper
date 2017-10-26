@@ -5,7 +5,7 @@ class View : Window {
 	private HeaderBar headerbar;
 	private string file;
 	private string window_title = "Sketch Paper";
-	private string preview_image;
+	private string preview_image = "";
 	private ArchiveController archive_controller;
 	private Box vbox;
 
@@ -29,6 +29,7 @@ class View : Window {
 
 		this.show_all ();
 		this.destroy.connect (Gtk.main_quit);
+		key_press_event.connect (on_key_pressed);
 	}
 
 	/**
@@ -64,13 +65,23 @@ class View : Window {
 			image.set_from_file (this.preview_image);
 			scroll.add (image);
 			this.vbox.pack_start (scroll, true, true, 0);
+		} else {
+			var grid = new Gtk.Grid ();
+			var data = new Gtk.Label ("Try opening a sketch file.");
+			Gtk.Image image = new Gtk.Image ();
+			grid.orientation = Gtk.Orientation.VERTICAL;
+			grid.add (new image.from_icon_name ("face-embarrassed", Gtk.IconSize.DIALOG));
+			grid.add (data);
+			this.vbox.pack_start (grid, true, false, 0);
 		}
+	}
+
+	public void open_file () {
+		this.on_open_clicked ();
 	}
 
 	/**
 	 * When the user clicks the Open button in the headerbar.
-	 * 
-	 * TODO- Move the archive/unarchive logic to a controller.
 	 */
 	private void on_open_clicked () {
 		var file_chooser = new FileChooserDialog ("Open File", this,
@@ -105,5 +116,32 @@ class View : Window {
 		this.setup_grid ();
 		this.add (this.vbox);
 		this.show_all ();
+	}
+
+	private void close_file () {
+		this.file = "";
+		this.headerbar.subtitle = this.file;
+		this.preview_image = "";
+		this.remove (this.vbox);
+		this.vbox = new Box (Orientation.VERTICAL, 0);
+		this.setup_grid ();
+		this.add (this.vbox);
+		this.show_all ();
+	}
+
+	private bool on_key_pressed (Gdk.EventKey event) {
+		string key = Gdk.keyval_name (event.keyval);
+
+		if (key == "o" && (event.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+			this.open_file ();
+			return true;
+		}
+
+		if (key == "w" && (event.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+			this.close_file ();
+			return true;
+		}
+
+		return false;
 	}
 }

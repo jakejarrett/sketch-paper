@@ -1,6 +1,7 @@
 using GLib;
 using Json;
 using Gtk;
+using Gee;
 
 class SketchPaper : Gtk.Application {
 
@@ -13,6 +14,7 @@ class SketchPaper : Gtk.Application {
 		GLib.Object (application_id: "com.github.jakejarrett.sketch-paper", flags: ApplicationFlags.FLAGS_NONE);
 		this.view = new View(options);
 	}
+
 
 	/**
 	 * Start the application

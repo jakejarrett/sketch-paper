@@ -9,8 +9,8 @@ class ArchiveController : GLib.Object {
 	 * Read the sketch file.
 	 */
 	public void read_file (string file) {
-		Posix.rmdir (this.file_destination);
 		Posix.mkdir (this.file_destination, 0700);
+		Posix.rmdir (this.file_destination + "/output/");
 		Posix.chdir (this.file_destination);
 		extract_file (file);
 	}

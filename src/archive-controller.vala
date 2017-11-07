@@ -13,6 +13,9 @@ class ArchiveController : GLib.Object {
 		Posix.rmdir (this.file_destination + "/output/");
 		Posix.chdir (this.file_destination);
 		extract_file (file);
+		PagesParser parser = new PagesParser();
+		parser.parse (this.file_destination);
+
 	}
 	
 	[CCode (cname = "extract_file")]

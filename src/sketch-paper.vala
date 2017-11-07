@@ -15,7 +15,6 @@ class SketchPaper : Gtk.Application {
 		this.view = new View(options);
 	}
 
-
 	/**
 	 * Start the application
 	 */

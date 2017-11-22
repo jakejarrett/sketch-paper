@@ -1,3 +1,4 @@
+using Gee;
 using GLib;
 using Posix;
 
@@ -8,6 +9,7 @@ public class PagesParser : GLib.Object {
 
 	private string document = "";
 	private string meta_file = "";
+	public ArrayList<string> list = new ArrayList<string> ();
 
 	private string read_file (string file) {
 		var file_instance = File.new_for_path (file);
@@ -36,7 +38,7 @@ public class PagesParser : GLib.Object {
 			parser.load_from_data (file);
 			var root_object = parser.get_root ().get_object ();
 			string page_name = this.get_page_name (root_object.get_string_member ("do_objectID"));
-			Posix.stdout.printf ("\n%s\n", page_name);
+			this.list.add (page_name);
 		} catch (Error e) {
 			Posix.stderr.printf ("Error: %s\n", e.message);
 		}
@@ -52,9 +54,6 @@ public class PagesParser : GLib.Object {
 			var root_object = parser.get_root ().get_object ();
 			var pages = root_object.get_object_member ("pagesAndArtboards");
 			var page_object = pages.get_object_member (page);
-
-			Posix.stdout.printf ("\n%s\n", page);
-
 			return_value = page_object.get_string_member ("name");
 		} catch (Error e) {
 			Posix.stderr.printf ("Error: %s\n", e.message);
@@ -67,6 +66,7 @@ public class PagesParser : GLib.Object {
 		var parser = new Json.Parser ();
 		this.document = this.read_file (file_directory + "/document.json");
 		this.meta_file = this.read_file (file_directory + "/meta.json");
+		this.list = new Gee.ArrayList<string> ();
 
 		try {
 			parser.load_from_data (this.document);
@@ -76,6 +76,13 @@ public class PagesParser : GLib.Object {
 			foreach (var page in pages.get_elements ()) {
 				var page_name = page.get_object ();
 				this.read_page (file_directory + "/" + page_name.get_string_member ("_ref") + ".json");
+			}
+
+			foreach (string page in this.list) {
+				GLib.stdout.printf ("string page in this.list");
+				GLib.stdout.printf ("\n");
+				GLib.stdout.printf (page);
+				GLib.stdout.printf ("\n");
 			}
 		} catch (Error e) {
 			Posix.stderr.printf ("Error: %s\n", e.message);

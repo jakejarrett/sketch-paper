@@ -8,25 +8,27 @@ class View : Window {
 	private string preview_image = "";
 	private ArchiveController archive_controller;
 	private Box vbox;
+	private Sidebar sidebar;
+	private PageView page_view;
+	public PagesParser pages_parser;
 
 	/**
 	 * Setup the main interface & determine if we should show an "Open" state.
 	 */
 	public View (Options options) {
-		this.archive_controller = new ArchiveController();
+		this.archive_controller = new ArchiveController ();
+		this.pages_parser = new PagesParser ();
+		this.page_view = new PageView (Orientation.HORIZONTAL, 0);
 
 		if (options.option_output != "") {
 			this.file = options.option_output;
-			this.archive_controller.read_file (this.file);
+			this.archive_controller.read_file (this.file, this.pages_parser);
 			this.preview_image = this.archive_controller.get_preview_image ();
 		}
 
 		this.headerbar = new Gtk.HeaderBar ();
 		this.setup_headerbar ();
-		this.vbox = new Box (Orientation.VERTICAL, 0);
 		this.setup_grid ();
-		this.add (this.vbox);
-
 		this.show_all ();
 		this.destroy.connect (Gtk.main_quit);
 		key_press_event.connect (on_key_pressed);
@@ -40,7 +42,7 @@ class View : Window {
 
 		var open_button = new Gtk.Button.with_label ("Open");
 		open_button.set_valign (Gtk.Align.CENTER);
-		open_button.clicked.connect (on_open_clicked);		
+		open_button.clicked.connect (on_open_clicked);
 		this.headerbar.pack_start (open_button);
 
 		this.headerbar.show_close_button = true;
@@ -58,21 +60,27 @@ class View : Window {
 	 * Setup the Grid interface.
 	 */
 	private void setup_grid () {
+		this.sidebar = new Sidebar();
+
+		//  this.vbox.set_homogeneous (false);
+
 		if (this.preview_image != "") {
-			var scroll = new ScrolledWindow (null, null);
-			scroll.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
-			Gtk.Image image = new Gtk.Image ();
-			image.set_from_file (this.preview_image);
-			scroll.add (image);
-			this.vbox.pack_start (scroll, true, true, 0);
+			this.sidebar.show_list (this.archive_controller.get_output_directory (), this.pages_parser);
+			this.vbox.pack_start (this.sidebar, false, false, 10);
+
+			this.page_view.show_preview (this.preview_image);
+			
+			this.vbox.pack_end (this.page_view, true, true, 0);
 		} else {
+			this.sidebar.show_empty ();
+			this.vbox.pack_start(this.sidebar, false, false, 10);
 			var grid = new Gtk.Grid ();
 			var data = new Gtk.Label ("Try opening a sketch file.");
 			Gtk.Image image = new Gtk.Image ();
 			grid.orientation = Gtk.Orientation.VERTICAL;
 			grid.add (new image.from_icon_name ("face-embarrassed", Gtk.IconSize.DIALOG));
 			grid.add (data);
-			this.vbox.pack_start (grid, true, false, 0);
+			this.vbox.pack_end (grid, true, true, 0);
 		}
 	}
 
@@ -99,7 +107,7 @@ class View : Window {
 		if (file_chooser.run () == ResponseType.ACCEPT) {
 			this.file = file_chooser.get_filename ();
 			file_chooser.destroy ();
-			this.archive_controller.read_file (this.file);
+			this.archive_controller.read_file (this.file, this.pages_parser);
 			this.on_open_file ();
 			this.show_all ();
 		}
@@ -112,9 +120,7 @@ class View : Window {
 		this.headerbar.subtitle = this.file;
 		this.preview_image = this.archive_controller.get_preview_image ();
 		this.remove (this.vbox);
-		this.vbox = new Box (Orientation.VERTICAL, 0);
-		this.setup_grid ();
-		this.add (this.vbox);
+		this.setup_box ();
 		this.show_all ();
 	}
 
@@ -123,9 +129,7 @@ class View : Window {
 		this.headerbar.subtitle = this.file;
 		this.preview_image = "";
 		this.remove (this.vbox);
-		this.vbox = new Box (Orientation.VERTICAL, 0);
-		this.setup_grid ();
-		this.add (this.vbox);
+		this.setup_box ();
 		this.show_all ();
 	}
 

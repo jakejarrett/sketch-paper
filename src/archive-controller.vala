@@ -8,12 +8,11 @@ class ArchiveController : GLib.Object {
 	/**
 	 * Read the sketch file.
 	 */
-	public void read_file (string file) {
+	public void read_file (string file, PagesParser parser) {
 		Posix.mkdir (this.file_destination, 0700);
 		Posix.rmdir (this.file_destination + "/output/");
 		Posix.chdir (this.file_destination);
 		extract_file (file);
-		PagesParser parser = new PagesParser();
 		parser.parse (this.file_destination);
 
 	}
@@ -23,6 +22,10 @@ class ArchiveController : GLib.Object {
 
 	public string get_preview_image () {
 		return this.file_destination + "/previews/preview.png";
+	}
+
+	public string get_output_directory () {
+		return this.file_destination;
 	}
 
 }

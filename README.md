@@ -2,6 +2,9 @@
 
 Supports opening Sketch files from `Sketch 43+`.
 
+## TODO
+* Rewrite main view to utilize GTK's sidebar view
+
 ## Note
 **This project is not yet ready for usage**
 
